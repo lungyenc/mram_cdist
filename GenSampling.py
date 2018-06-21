@@ -105,6 +105,7 @@ class GenSampling:
         else:
             self.notReady()
 
+
     def mplot(self):
         if self.rdy:
             if self.ceq is None:
@@ -125,5 +126,73 @@ class GenSampling:
         else:
             self.notReady()
 
+    def meanPlot(self):
+        if self.rdy:
+            mean = np.mean(self.ceq, axis=0)
+            plt.plot(mean,'-o')
+            plt.show()
+        else:
+            self.notReady()
 
+    def variancePlot(self):
+        if self.rdy:
+            variance = np.std(self.ceq, axis = 0)
+            plt.plot(variance,'-o')
+            plt.show()
+        else:
+            self.notReady()            
+
+    def snrPlot(self):
+        if self.rdy:
+            mean = np.mean(self.ceq, axis=0)
+            for i in range(len(mean)-1, 0, -1):
+                mean[i] -= mean[i-1]
+            variance = np.std(self.ceq, axis = 0)
+            for i in range(len(variance)-1, 0, -1):
+                #variance[i] = max(variance[i], variance[i-1])
+                variance[i] = variance[i] + variance[i-1]
+            snr = (mean/variance)
+            snr = snr * snr 
+            snr = snr[1:len(snr)]
+            plt.plot(snr,'-o')
+            plt.show()
+        else:
+            self.notReady()   
+
+    def snrNcellPlot(self, nCells):
+        if self.rdy:
+            print('Sapmling the lowest SNR cases...')
+            ceq = np.zeros((nCells-1, self.nTest, 2))
+            for k in range(2, nCells+1, 1):
+                for t in range(self.nTest):
+                    for i in range(k-1,k+1,1):
+                        ctemp = 0
+                        for j in range(i):
+                            ctemp = ctemp + 1/np.random.normal(self.rpM,self.rpStd)
+                        for j in range(k-i):
+                            ctemp = ctemp + 1/np.random.normal(self.rapM,self.rapStd)
+                        ceq[k-2, t, i-k+1] = ctemp
+            ceq *= 1000
+            mean = np.mean(ceq, axis=1)
+            mean = mean[:,1] - mean[:,0]
+            variance = np.std(ceq, axis = 1)
+            variance= variance[:, 1] + variance[:, 0]
+            snr = (mean/variance)
+            snr = snr * snr 
+            plt.plot(range(2, nCells+1, 1), snr,'-o')
+            plt.show()
+        else:
+            self.notReady()            
+
+
+### Class Test ###
+if __name__ == '__main__':
+    test = GenSampling(6000, 12000, 350, 700, 32, 1000)
+    test.printSetting()
+    #test.samplePlot()
+    test.sample()
+    #test.meanPlot()
+    #test.variancePlot()
+    test.snrPlot()
+    #test.snrNcellPlot(128)
 
