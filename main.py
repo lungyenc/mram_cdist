@@ -1,25 +1,29 @@
 # main.py
-# This program plots the conductance distribution of multiple MRAM cells on a bit-line based on
-# Rp (resistance-parallel) mean and variance
-# Rap (resistance-anti-parallel) mean and variance
-# number of MRAM cells on a bit-line
-# note that we assume the random variables of each MRAM have the same distribution but independent
+# This program plots the conductance distribution of multiple MRAM cells on a 
+# bit-line based on:
+# [1] Rp (resistance-parallel) mean and variance
+# [2] Rap (resistance-anti-parallel) mean and variance
+# [3] number of MRAM cells on a bit-line
+# note that we assume the random variables of each MRAM have the same 
+# but independent distribution
 
 import GenSampling as gs
 
-INSTLIST = '[1] Start a new analysis\n' 
-INSTLIST += '[2] Sample and plot with the current settings\n'
-INSTLIST += '[3] Sameplew with the current settings\n'
-INSTLIST += '[4] Plot the distribition\n'
-INSTLIST += '[5] Change R\n'
-INSTLIST += '[6] Print the current settings\n'
-INSTLIST += '[7] Print instrcutions\n'
-INSTLIST += '[8] Exit the program\n'
+INSTLIST = ('[1] Start a new analysis\n' 
+'[2] Sample and plot with the current settings\n'
+'[3] Sameplew with the current settings\n'
+'[4] Plot the distribition\n'
+'[5] Change R\n'
+'[6] Print the current settings\n'
+'[7] Print instrcutions\n'
+'[8] Exit the program\n')
 
-target = gs.GenSampling(0, 0, 0, 0, 0, 0)
+target = gs.GenSampling(None, None, None, None, None, None)
 
 def newAyalsis():
 	print('Staring a new analysis...\n')
+	global target
+	target = gs.GenSampling(0, 0, 0, 0, 0, 0)	
 	changeR()
 	changeNCell()
 	changeNTest()
@@ -28,7 +32,8 @@ def newAyalsis():
 
 def changeR():
 	while(1):
-		inp = input('Please enter new RpMean RapMean RpStd RapStd: (No leading space)  Ex: 6000 12000 350 700\n')
+		inp = input('Please enter new RpMean RapMean RpStd RapStd: (No leading' 
+			'space)  Ex: 6000 12000 350 700\n')
 		ints = list(map(int, inp.split(' ')))
 		if len(ints) is 4:
 			break
@@ -68,17 +73,22 @@ def plot():
 def printGs():
 	target.printSetting()
 
-print('\n\n********************************************************************\n'
-	  '*  Welcome to the equaivalent conductance analyzer for MRAM cells  *\n'
-	  '********************************************************************\n\n')
-newAyalsis()
-print('\n\n'+INSTLIST)
+print('\n\n'
+'********************************************************************\n'
+'*  Welcome to the equaivalent conductance analyzer for MRAM cells  *\n'
+'********************************************************************\n\n')
+
+print(INSTLIST)
 
 while(1):
-	inp = input('Please enter an instruction: ')
-	if inp is 'help':
-		inp = 7
-	inp2 = int(inp)
+	inp = input('Please enter an instruction or help for the instrcution list: ')
+	if inp == 'help':
+		inp = '7'
+	try:
+		inp2 = int(inp)
+	except ValueError:
+		print('Please enter 1 to 8')
+		continue
 	if (inp2 > 0 and inp2 < 9):
 		if inp2 is 1:
 			newAyalsis()
@@ -93,8 +103,8 @@ while(1):
 		elif inp2 is 6:
 			printGs()	
 		elif inp2 is 7:
-			print(INSTLIST)
+			print('\n'+INSTLIST)
 		elif inp2 is 8:
 			break
 	else:
-		print('Enter Error')	
+		print('Please enter 1 to 8')	
