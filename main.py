@@ -11,12 +11,16 @@ import GenSampling as gs
 
 INSTLIST = ('[1] Start a new analysis\n' 
 '[2] Sample and plot with the current settings\n'
-'[3] Sameplew with the current settings\n'
+'[3] Sameple with the current settings\n'
 '[4] Plot the distribition\n'
 '[5] Change R\n'
 '[6] Print the current settings\n'
-'[7] Print instrcutions\n'
-'[8] Exit the program\n')
+'[7] Plot mean vs Cells\n'
+'[8] Plot variance vs Cells\n'
+'[9] Plot SNR vs Cells\n'
+'[0] Plot SNR vs Number of Cells\n'
+'[I] Print instrcutions\n'
+'[E] Exit the program\n')
 
 target = gs.GenSampling(None, None, None, None, None, None)
 
@@ -28,7 +32,6 @@ def newAyalsis():
 	changeNCell()
 	changeNTest()
 	printGs()
-	sampleplot()
 
 def changeR():
 	while(1):
@@ -73,6 +76,18 @@ def plot():
 def printGs():
 	target.printSetting()
 
+def meanPlot():
+	target.meanPlot()
+
+def variancePlot():
+	target.variancePlot()	
+
+def snrPlot():
+	target.snrPlot()
+
+def snrNcellPlot(times):
+	target.snrNcellPlot(times)
+
 print('\n\n'
 '********************************************************************\n'
 '*  Welcome to the equaivalent conductance analyzer for MRAM cells  *\n'
@@ -82,14 +97,16 @@ print(INSTLIST)
 
 while(1):
 	inp = input('Please enter an instruction or help for the instrcution list: ')
-	if inp == 'help':
-		inp = '7'
+	if inp == 'help' or inp =='I':
+		print('\n'+INSTLIST)
+	elif inp == 'E':
+		break
 	try:
 		inp2 = int(inp)
 	except ValueError:
-		print('Please enter 1 to 8')
+		print('Please enter a correct instrcution')
 		continue
-	if (inp2 > 0 and inp2 < 9):
+	if (inp2 >=0 and inp2 <= 9):
 		if inp2 is 1:
 			newAyalsis()
 		elif inp2 is 2:
@@ -103,8 +120,14 @@ while(1):
 		elif inp2 is 6:
 			printGs()	
 		elif inp2 is 7:
-			print('\n'+INSTLIST)
+			meanPlot()
 		elif inp2 is 8:
-			break
+			variancePlot()
+		elif inp2 is 9:
+			snrPlot()
+		elif inp2 is 0:
+			times = input('Up to how many cells?')
+			times = int(times)
+			snrNcellPlot(times)				
 	else:
-		print('Please enter 1 to 8')	
+		print('Please enter a correct instrcution')	
