@@ -27,7 +27,6 @@ class GenAnalytical:
         self.histInt = histInt
         self.mdScalar = (self.cpM - self.capM)/math.sqrt(2)
 
-
     def ithMean(self, numberState):
         return numberState * self.cpM + (self.nCell - numberState) * self.capM
 
@@ -41,7 +40,6 @@ class GenAnalytical:
     def phiScalar(self, x, i):  # private helper function - centered
         return 0.5 * (1 + math.erf(x* self.mdScalar / self.ithStd(i)))
 
-
     def probithj(self, i, j):
         if (j != 0 and j != self.nCell):
             return self.phiScalar(j+0.5-i, i) - self.phiScalar(j-0.5-i, i)
@@ -50,11 +48,21 @@ class GenAnalytical:
         else:
             return 1 - self.phiScalar(self.nCell-0.5-i, i)
 
+    def ithsnr(self, i):
+        noise = 0.
+        for j in range(self.nCell+1):
+            noise += self.probithj(i, j) * ((j-i)**2)
+        return i * i / noise
 
+    def avgsnr(self):
+        avg = 0.
+        for i in range(self.nCell+1):
+            avg += self.ithsnr(i)
+        return avg / (self.nCell+1)
 
 ### Class Test ###
 if __name__ == '__main__':
-    test = GenAnalytical(6000, 12000, 350, 700, 32, 0.15)
+    test = GenAnalytical(6000, 12000, 350, 700, 2, 0.15)
     # print(test.ithMean(5)) # check ithMean
     # print(test.ithStd(16)) # check ithStd
     # print(test.phi(0.000043479, 16)-test.phi(-0.000043479, 16)) # check phi
@@ -70,6 +78,20 @@ if __name__ == '__main__':
     print(test.probithj(1, 0))
     print(test.probithj(1, 1))
     print(test.probithj(1, 2))
+    print(test.ithsnr(0))
+    print(test.ithsnr(1))
+    # print(test.ithsnr(2))
+    # print(test.ithsnr(32))
+    # print(test.probithj(32, 30))
+    print(test.avgsnr())
 
+
+    numberCells = 128
+    snr = np.zeros((numberCells, 1))
+    for i in range(2, numberCells+1, 1):
+        test = GenAnalytical(6000, 12000, 350, 700, i, 0.15)
+        snr[i-1, 0] = test.avgsnr()
+    plt.plot(snr[1:numberCells,0],'-o')
+    plt.show()
 
 
